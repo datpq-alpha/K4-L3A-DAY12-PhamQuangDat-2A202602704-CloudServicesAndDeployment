@@ -6,7 +6,7 @@
 > Cách trả lời: thay dòng `> *Câu trả lời của bạn*` bằng câu trả lời.
 > `grade.py` đếm số câu đã trả lời (15 điểm cho 10 câu).
 >
-> Họ và tên: ..........................  Mã học viên: ..........................
+> Họ và tên: Phạm Quang Đạt  Mã học viên: 2A202602704
 
 ---
 
@@ -16,7 +16,7 @@ Trong `Settings`, `agent_api_key` không có giá trị mặc định nên app c
 khi khởi động nếu thiếu biến môi trường. Hãy mô tả một tình huống cụ thể mà
 việc "chết sớm" này cứu bạn, so với việc để mặc định `"changeme"`.
 
-> *Câu trả lời của bạn*
+> Khi deploy service lên Railway, tôi quên cấu hình biến AGENT_API_KEY. Vì trường này không có giá trị mặc định, ứng dụng thất bại ngay khi khởi động và dashboard báo lỗi, nên tôi phát hiện và bổ sung secret trước khi service nhận traffic. Nếu code dùng mặc định "changeme", ứng dụng vẫn hoạt động với một khóa dễ đoán; người khác có thể gọi /ask trái phép, làm phát sinh chi phí LLM hoặc sử dụng hết ngân sách trước khi tôi nhận ra.
 
 ---
 
@@ -26,7 +26,7 @@ Chạy service và gọi `/ask` vài lần. Dán một dòng log JSON bạn thu 
 nêu **hai** việc bạn làm được với dòng log đó mà `print("đã trả lời xong")`
 không làm được.
 
-> *Câu trả lời của bạn*
+> *Câu trả lời của bạn* (TODO: hoàn thành sau CP4 để lấy log thật từ `/ask`.)
 
 ---
 
@@ -42,7 +42,7 @@ docker images | grep agent
 
 | Bản | Dung lượng |
 |-----|-----------|
-| 1 stage (bản đầu) | ... MB |
+| 1 stage (bản đầu) | 271 MB |
 | Multi-stage | ... MB |
 
 Giải thích: phần dung lượng chênh lệch đó là những gì?
