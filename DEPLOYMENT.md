@@ -10,17 +10,17 @@
 
 | Mục | Nội dung |
 |-----|----------|
-| Họ và tên | (điền họ tên) |
-| Mã học viên | (điền mã học viên) |
-| Repo | (điền link repo K4-L3A-DAY12-HoVaTen-MSSV-CloudServicesAndDeployment) |
+| Họ và tên | Phạm Quang Đạt |
+| Mã học viên | 2A202602704 |
+| Repo | https://github.com/datpq-alpha/K4-L3A-DAY12-PhamQuangDat-2A202602704-CloudServicesAndDeployment |
 
 ## Service
 
 | Mục | Nội dung |
 |-----|----------|
-| Public URL | https://TODO-thay-bang-url-that.up.railway.app |
-| Platform | Railway / Render / Cloud Run — (điền platform bạn dùng) |
-| Ngày deploy | (điền ngày) |
+| Public URL | https://day12-agent-jmni.onrender.com |
+| Platform |  Render |
+| Ngày deploy | 28/09/2026 |
 
 ## Biến Môi Trường Đã Set Trên Cloud
 
@@ -30,7 +30,7 @@ Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
 |------|--------|---------|
 | `PORT` | ✅ | platform tự gán |
 | `AGENT_API_KEY` | ✅ | đặt trong dashboard, không nằm trong repo |
-| `REDIS_URL` | ✅ | (điền: Redis add-on của platform / Upstash / ...) |
+| `REDIS_URL` | ✅ | Render Key Value, connection string được Render tự động gắn |
 | `RATE_LIMIT_PER_MINUTE` | ✅ | 10 |
 | `MONTHLY_BUDGET_USD` | ✅ | 10.0 |
 | `LOG_LEVEL` | ✅ | INFO |
@@ -73,7 +73,74 @@ done; echo
 Dán output của các lệnh trên vào đây:
 
 ```
-(điền output)
+#1: curl.exe -i "https://day12-agent-jmni.onrender.com/health"
+
+HTTP/1.1 200 OK
+Date: Mon, 28 Sep 2026 10:53:59 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+cf-cache-status: DYNAMIC
+rndr-id: f8a8395d-5ce6-4ce7
+Server: cloudflare
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+CF-RAY: a4223498dc12fd0a-SIN
+alt-svc: h3=":443"; ma=86400
+
+{"status":"ok","service":"day12-agent","version":"1.0.0"}
+
+#2: curl.exe -i "https://day12-agent-jmni.onrender.com/ready" 
+
+HTTP/1.1 200 OK
+Date: Mon, 28 Sep 2026 10:55:57 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+cf-cache-status: DYNAMIC
+rndr-id: 034d930a-b744-4f21
+Server: cloudflare
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+CF-RAY: a42237fed9a3f9e6-SIN
+alt-svc: h3=":443"; ma=86400
+
+{"status":"ready","redis":true}
+
+#3: curl.exe -i -X POST "https://day12-agent-jmni.onrender.com/ask" -H "Content-Type: application/json" --data-raw '{\"question\":\"Hello\"}'
+
+HTTP/1.1 401 Unauthorized
+Date: Mon, 28 Sep 2026 10:58:49 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+cf-cache-status: DYNAMIC
+rndr-id: 01ea16b2-33c0-498e
+Server: cloudflare
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+CF-RAY: a4223c3479d040e8-SIN
+alt-svc: h3=":443"; ma=86400
+
+{"detail":"invalid or missing API key"}
+
+#4: $env:PYTHONIOENCODING="utf-8"; .\.venv\Scripts\python.exe -c "import json,uuid,httpx; from dotenv import dotenv_values; c=dotenv_values('.env'); r=httpx.post('https://day12-agent-jmni.onrender.com/ask',headers={'X-API-Key':c['DEPLOY_API_KEY'],'X-User-Id':'deploy-doc-'+uuid.uuid4().hex},json={'question':'Deploy là gì?'},timeout=60); print('STATUS:',r.status_code); print(json.dumps(r.json(),ensure_ascii=False,indent=2))"
+
+STATUS: 200
+{
+  "answer": "Câu hỏi hay. Deploy là gì thường được giải quyết bằng cách chuẩn hóa môi trường chạy: cùng một image chạy giống nhau ở laptop và trên cloud.",
+  "user_id": "deploy-doc-d44e0239698344ab82bf19fe38c62a12",
+  "history_length": 0,
+  "cost_usd": 2.145e-05,
+  "tokens": {
+    "in": 3,
+    "out": 35
+  }
+}
+
+#5: $k=((Get-Content .env | Where-Object { $_ -match '^DEPLOY_API_KEY=' } | Select-Object -First 1) -replace '^DEPLOY_API_KEY=','').Trim(); $uid="rate-test-$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"; 1..15 | ForEach-Object { curl.exe -s -o NUL -w "%{http_code} " -X POST "https://day12-agent-jmni.onrender.com/ask" -H "Content-Type: application/json" -H "X-API-Key: $k" -H "X-User-Id: $uid" --data-raw '{\"question\":\"test\"}' }; Write-Host
+
+200 200 200 200 200 200 200 200 200 200 429 429 429 429 429
 ```
 
 ## Ảnh Chụp Màn Hình
@@ -83,19 +150,4 @@ Dán output của các lệnh trên vào đây:
 - `screenshots/dashboard.png` — trang quản lý service trên platform
 - `screenshots/health.png` — kết quả gọi `/health` từ trình duyệt hoặc curl
 
----
 
-## Nếu Dùng Phương Án Dự Phòng
-
-Không đăng ký được tài khoản cloud? Vẫn nộp được bài, nhưng CP5 tối đa 60% điểm:
-
-1. Đặt `LOCAL_FALLBACK=true` trong `.env`
-2. Chạy `docker compose up -d` rồi kiểm tra `docker compose ps`
-3. Chụp màn hình vào `screenshots/`
-4. Chạy `pytest tests/test_cp5.py -v` — bộ test sẽ tự chuyển sang kiểm tra
-   `http://localhost:8000`
-5. Ghi rõ lý do không deploy được vào phần dưới đây:
-
-```
-(điền lý do nếu dùng phương án dự phòng, ngược lại xóa mục này)
-```
